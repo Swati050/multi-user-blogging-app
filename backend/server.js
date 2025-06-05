@@ -15,8 +15,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const authRoutes = require("./routes/auth");
-const blogRoutes = require("./routes/blogs");
+const authRoutes = require("./routes/authRoutes");
+const blogRoutes = require("./routes/blogRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware"); // Import error handlers
 
 // Load env vars
@@ -50,8 +50,10 @@ app.get("/health", (req, res) => {
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected:", process.env.MONGO_URI))
+  .connect(process.env.MONGO_URI || "mongodb://localhost:27017/blog-app")
+  .then(() =>
+    console.log("MongoDB Connected:", process.env.MONGO_URI || "localhost")
+  )
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
 // Simple route for testing

@@ -189,7 +189,12 @@ const SignupPage = () => {
 
           <Text mt={2}>
             Already have an account?{" "}
-            <ChakraLink as={RouterLink} to="/login" color="teal.500" fontWeight="bold">
+            <ChakraLink
+              as={RouterLink}
+              to="/login"
+              color="teal.500"
+              fontWeight="bold"
+            >
               Login here
             </ChakraLink>
           </Text>
