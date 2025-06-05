@@ -25,6 +25,17 @@ dotenv.config();
 const app = express();
 
 // Middleware
+app.use(express.json());
+
+// Debug middleware - Add more detailed logging
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.log("Request Headers:", req.headers);
+  console.log("Request Query:", req.query);
+  next();
+});
+
+// CORS configuration
 app.use(
   cors({
     origin:
@@ -38,22 +49,22 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
-
-// Debug middleware
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
-  next();
-});
-
-// Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/blogs", blogRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
+
+// Simple route for testing
+app.get("/", (req, res) => {
+  res.json({ message: "API is running..." });
+});
+
+// Mount routes
+console.log("Mounting routes...");
+app.use("/api/auth", authRoutes);
+app.use("/api/blogs", blogRoutes);
+console.log("Routes mounted successfully");
 
 // Connect to MongoDB with improved options
 mongoose
@@ -67,11 +78,6 @@ mongoose
     console.error("Error connecting to MongoDB:", err);
     process.exit(1);
   });
-
-// Simple route for testing
-app.get("/", (req, res) => {
-  res.json({ message: "API is running..." });
-});
 
 // Middleware for 404 Not Found errors - Should be after all specific routes
 app.use((req, res, next) => {
