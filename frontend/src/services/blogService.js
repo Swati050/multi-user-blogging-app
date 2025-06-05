@@ -1,8 +1,38 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.PROD
-  ? "https://blog-app-backend.onrender.com/api/blogs"
-  : "/api/blogs";
+const BASE_URL = import.meta.env.PROD
+  ? "https://blog-app-backend.onrender.com"
+  : "";
+
+const API_URL = `${BASE_URL}/api/blogs`;
+
+// Add request interceptor for debugging
+axios.interceptors.request.use(
+  (config) => {
+    console.log("Making request to:", config.url);
+    return config;
+  },
+  (error) => {
+    console.error("Request error:", error);
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for debugging
+axios.interceptors.response.use(
+  (response) => {
+    console.log("Response received:", response.status);
+    return response;
+  },
+  (error) => {
+    console.error(
+      "Response error:",
+      error.response?.status,
+      error.response?.data
+    );
+    return Promise.reject(error);
+  }
+);
 
 /**
  * @service blogService
