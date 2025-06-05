@@ -13,9 +13,20 @@ const api = axios.create({
   },
 });
 
-// Add request interceptor for debugging
+// Add request interceptor for authentication
 api.interceptors.request.use(
   (config) => {
+    const token = localStorage.getItem("blogUser");
+    if (token) {
+      try {
+        const userData = JSON.parse(token);
+        if (userData.token) {
+          config.headers.Authorization = `Bearer ${userData.token}`;
+        }
+      } catch (error) {
+        console.error("Error parsing user token:", error);
+      }
+    }
     console.log("Making request to:", config.url);
     return config;
   },
