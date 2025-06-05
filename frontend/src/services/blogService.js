@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const BASE_URL = import.meta.env.PROD
-  ? "https://blog-app-backend.onrender.com"
+  ? "https://multi-user-blogging-app.onrender.com"
   : "";
 
 // Create axios instance with default config
