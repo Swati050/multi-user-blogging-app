@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_URL = "/api/auth"; // Will be proxied to backend in development
+const API_URL = import.meta.env.PROD
+  ? "https://multi-user-blogging-app.onrender.com/api/auth"
+  : "/api/auth";
 
 /**
  * @service authService
