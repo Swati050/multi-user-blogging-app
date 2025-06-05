@@ -4,10 +4,17 @@ const BASE_URL = import.meta.env.PROD
   ? "https://blog-app-backend.onrender.com"
   : "";
 
-const API_URL = `${BASE_URL}/api/blogs`;
+// Create axios instance with default config
+const api = axios.create({
+  baseURL: BASE_URL,
+  timeout: 10000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 // Add request interceptor for debugging
-axios.interceptors.request.use(
+api.interceptors.request.use(
   (config) => {
     console.log("Making request to:", config.url);
     return config;
@@ -19,7 +26,7 @@ axios.interceptors.request.use(
 );
 
 // Add response interceptor for debugging
-axios.interceptors.response.use(
+api.interceptors.response.use(
   (response) => {
     console.log("Response received:", response.status);
     return response;
@@ -37,7 +44,6 @@ axios.interceptors.response.use(
 /**
  * @service blogService
  * @description Service module for handling all blog-related API calls.
- * Uses axios for HTTP requests and handles authentication via interceptors.
  */
 const blogService = {
   /**
@@ -52,9 +58,10 @@ const blogService = {
    */
   getAllBlogs: async (params = {}) => {
     try {
-      const response = await axios.get(API_URL, { params });
+      const response = await api.get("/api/blogs", { params });
       return response.data;
     } catch (error) {
+      console.error("Error fetching blogs:", error);
       throw new Error(error.response?.data?.message || "Failed to fetch blogs");
     }
   },
@@ -67,9 +74,10 @@ const blogService = {
    */
   getBlogById: async (id) => {
     try {
-      const response = await axios.get(`${API_URL}/${id}`);
+      const response = await api.get(`/api/blogs/${id}`);
       return response.data;
     } catch (error) {
+      console.error("Error fetching blog:", error);
       throw new Error(
         error.response?.data?.message || "Failed to fetch blog post"
       );
@@ -88,9 +96,10 @@ const blogService = {
    */
   createBlog: async (blogData) => {
     try {
-      const response = await axios.post(API_URL, blogData);
+      const response = await api.post("/api/blogs", blogData);
       return response.data;
     } catch (error) {
+      console.error("Error creating blog:", error);
       throw new Error(
         error.response?.data?.message || "Failed to create blog post"
       );
@@ -110,9 +119,10 @@ const blogService = {
    */
   updateBlog: async (id, blogData) => {
     try {
-      const response = await axios.put(`${API_URL}/${id}`, blogData);
+      const response = await api.put(`/api/blogs/${id}`, blogData);
       return response.data;
     } catch (error) {
+      console.error("Error updating blog:", error);
       throw new Error(
         error.response?.data?.message || "Failed to update blog post"
       );
@@ -127,9 +137,10 @@ const blogService = {
    */
   deleteBlog: async (id) => {
     try {
-      const response = await axios.delete(`${API_URL}/${id}`);
+      const response = await api.delete(`/api/blogs/${id}`);
       return response.data;
     } catch (error) {
+      console.error("Error deleting blog:", error);
       throw new Error(
         error.response?.data?.message || "Failed to delete blog post"
       );

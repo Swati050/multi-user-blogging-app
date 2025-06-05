@@ -32,7 +32,7 @@ app.use(
         ? [
             "https://multi-user-blogging-app.vercel.app",
             "http://localhost:5173",
-            "https://multi-user-blogging-app-frontend.vercel.app"
+            "https://multi-user-blogging-app-frontend.vercel.app",
           ]
         : "http://localhost:5173",
     credentials: true,
@@ -64,7 +64,7 @@ mongoose
 
 // Simple route for testing
 app.get("/", (req, res) => {
-  res.send("API is running...");
+  res.json({ message: "API is running..." });
 });
 
 // Middleware for 404 Not Found errors - Should be after all specific routes
