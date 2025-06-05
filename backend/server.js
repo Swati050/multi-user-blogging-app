@@ -15,8 +15,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const authRoutes = require("./routes/authRoutes");
-const blogRoutes = require("./routes/blogRoutes");
+const authRoutes = require("./routes/auth");
+const blogRoutes = require("./routes/blogs");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware"); // Import error handlers
 
 // Load env vars
@@ -48,13 +48,18 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
-// Connect to MongoDB
+// Connect to MongoDB with improved options
 mongoose
-  .connect(process.env.MONGO_URI || "mongodb://localhost:27017/blog-app")
-  .then(() =>
-    console.log("MongoDB Connected:", process.env.MONGO_URI || "localhost")
-  )
-  .catch((err) => console.error("Error connecting to MongoDB:", err));
+  .connect(process.env.MONGO_URI, {
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+    connectTimeoutMS: 10000,
+  })
+  .then(() => console.log("MongoDB Connected:", process.env.MONGO_URI))
+  .catch((err) => {
+    console.error("Error connecting to MongoDB:", err);
+    process.exit(1);
+  });
 
 // Simple route for testing
 app.get("/", (req, res) => {
@@ -78,13 +83,54 @@ const server = app.listen(PORT, () => {
   );
 });
 
+// Handle process termination signals
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received. Shutting down gracefully...");
+  server.close(() => {
+    console.log("Process terminated");
+    mongoose.connection.close(false, () => {
+      console.log("MongoDB connection closed");
+      process.exit(0);
+    });
+  });
+});
+
+process.on("SIGINT", () => {
+  console.log("SIGINT received. Shutting down gracefully...");
+  server.close(() => {
+    console.log("Process terminated");
+    mongoose.connection.close(false, () => {
+      console.log("MongoDB connection closed");
+      process.exit(0);
+    });
+  });
+});
+
 // Handle unhandled promise rejections (e.g. MongoDB connection issues)
 process.on("unhandledRejection", (err, promise) => {
   console.error(`Unhandled Rejection: ${err.message}`);
   // Close server & exit process
   if (server) {
-    server.close(() => process.exit(1));
+    server.close(() => {
+      mongoose.connection.close(false, () => {
+        process.exit(1);
+      });
+    });
   } else {
-    process.exit(1); // If server hasn't started, just exit
+    process.exit(1);
+  }
+});
+
+// Handle uncaught exceptions
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+  if (server) {
+    server.close(() => {
+      mongoose.connection.close(false, () => {
+        process.exit(1);
+      });
+    });
+  } else {
+    process.exit(1);
   }
 });
