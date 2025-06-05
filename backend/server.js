@@ -32,6 +32,7 @@ app.use(
         ? [
             "https://multi-user-blogging-app.vercel.app",
             "http://localhost:5173",
+            "https://multi-user-blogging-app-frontend.vercel.app"
           ]
         : "http://localhost:5173",
     credentials: true,
