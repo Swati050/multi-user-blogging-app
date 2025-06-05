@@ -1,0 +1,5 @@
+/*
+  This file can be used for any truly global base styles if absolutely necessary,
+  but Chakra UI typically handles resets and base theming through ChakraProvider.
+  The default Vite demo styles have been removed.
+*/
