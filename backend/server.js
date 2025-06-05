@@ -40,6 +40,12 @@ app.use(
 );
 app.use(express.json());
 
+// Debug middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/blogs", blogRoutes);
@@ -68,10 +74,25 @@ app.get("/", (req, res) => {
 });
 
 // Middleware for 404 Not Found errors - Should be after all specific routes
-app.use(notFound);
+app.use((req, res, next) => {
+  console.log(`404 Not Found: ${req.method} ${req.url}`);
+  res.status(404).json({
+    statusCode: 404,
+    message: `Cannot ${req.method} ${req.url}`,
+    error: "Not Found",
+  });
+});
 
 // Custom Error Handler Middleware - Should be the last middleware
-app.use(errorHandler);
+app.use((err, req, res, next) => {
+  console.error("Error:", err);
+  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  res.status(statusCode).json({
+    statusCode,
+    message: err.message,
+    error: err.name,
+  });
+});
 
 const PORT = process.env.PORT || 5000;
 
